@@ -48,6 +48,15 @@
         </form>
     </div>
     <div class="text-center p-8">
+        <div class="text-center p-8">
+            <!-- Button <div> for updating a company -->
+            <button onclick="goToCountry()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+                Search By country
+            </button>
+            <button onclick="goToReputation()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+                Search By Reputation
+            </button>
+        </div>
         <!-- Button <div> for updating a company -->
         <button onclick="goToUpdateCompany()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
             Go to Update Company
@@ -62,6 +71,13 @@
 
     <script>
         const createCompanyForm = document.getElementById('createCompanyForm');
+        function goToCountry() {
+            window.location.href = "searchCountry.html";
+        }
+        
+        function goToReputation() {
+            window.location.href = "searchReputation.html";
+        }
 
         function goToHome() {
             window.location.href = "index.html";

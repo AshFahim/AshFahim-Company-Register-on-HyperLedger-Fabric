@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search by Company Reputation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-200 h-screen flex justify-center items-center">
+    <div class="max-w-md w-full p-6 bg-white rounded-md shadow-md">
+        <h2 class="text-xl mb-4">Enter a company reputation:</h2>
+        <input type="text" id="reputationInput" class="w-full border-gray-300 rounded-md px-3 py-2 mb-4">
+        <button onclick="fetchAndFilterDataByReputation()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Submit</button>
+        
+        <div id="output" class="mt-4"></div>
+    </div>
+    <div class="text-center p-8">
+        <!-- Button <div> for updating a company -->
+        <button onclick="goToHome()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            Home Page
+        </button>
+        <div class="text-center p-8">
+            <!-- Button <div> for updating a company -->
+            <button onclick="goToUser()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+                User Home Page
+            </button>
+        </div>
+    </div>
+    
+
+    <script>
+
+        function goToUser() {
+            window.location.href = "userHome.html";
+        }
+
+        function goToHome() {
+            window.location.href = "index.html";
+        }
+
+        function fetchAndFilterDataByReputation() {
+            const reputation = document.getElementById('reputationInput').value;
+
+            // Make a GET request to fetch data from http://localhost:3000/get-company
+            fetch('http://localhost:3000/get-company')
+                .then(response => {
+                    // Check if the response is successful
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    // Parse the JSON data in the response
+                    return response.json();
+                })
+                .then(data => {
+                    // Filter the JSON data based on the entered company reputation
+                    const filteredData = data.filter(company => company.Record.companyReputation === reputation);
+
+                    // Display the filtered data
+                    const outputDiv = document.getElementById('output');
+                    outputDiv.innerHTML = '<h2 class="text-xl mb-2">Filtered Company Data</h2>';
+                    if (filteredData.length === 0) {
+                        outputDiv.innerHTML += '<p class="text-red-500">No companies found with the entered reputation.</p>';
+                    } else {
+                        outputDiv.innerHTML += '<ul class="list-disc pl-6">';
+                        filteredData.forEach(company => {
+                            const companyDetails = company.Record;
+                            outputDiv.innerHTML += `
+                                <li class="mb-4">
+                                    <strong>Name:</strong> ${companyDetails.name}<br>
+                                    <strong>ID:</strong> ${companyDetails.ID}<br>
+                                    <strong>Cash Inflow:</strong> ${companyDetails.cashInflow}<br>
+                                    <strong>Cash Outflow:</strong> ${companyDetails.cashOutFlow}<br>
+                                    <strong>Company Reputation:</strong> ${companyDetails.companyReputation}<br>
+                                    <strong>Company Type:</strong> ${companyDetails.companyType}<br>
+                                    <strong>Country of Origin:</strong> ${companyDetails.countryOfOrigin}<br>
+                                    <strong>Employee Count:</strong> ${companyDetails.employeeCount}<br>
+                                    <strong>Poor Reputation Month:</strong> ${companyDetails.poorRepMonth}<br>
+                                </li>
+                            `;
+                        });
+                        outputDiv.innerHTML += '</ul>';
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+    </script>
+
+</body>
+</html>
+
