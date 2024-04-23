@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Company Management</title>
+</head>
+<body class="bg-gray-100">
+    <div class="text-center p-8">
+        <h1 class="text-3xl font-semibold mb-4">Company Management Admin View</h1>
+        <button onclick="getAllCompanies()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Get All Companies</button>
+        <span class="mx-2">||</span>
+        <input id="search-input" type="text" placeholder="Search by ID" class="border border-gray-400 rounded px-4 py-2">
+        <button onclick="searchCompanies()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Search</button>
+        <div id="show-companies" class="mt-8"></div>
+    </div>
+
+    <div class="text-center p-8">
+        <h3 class="text-xl font-semibold mb-4">Create Company</h3>
+        <form id="createCompanyForm" class="max-w-md mx-auto">
+            <div class="mb-4">
+                <label for="companyID" class="block text-gray-700">Company ID</label>
+                <input type="text" id="companyID" name="companyID" required class="form-input mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700">Name</label>
+                <input type="text" id="name" name="name" required class="form-input mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="companyType" class="block text-gray-700">Company Type</label>
+                <select id="companyType" name="companyType" required class="form-select mt-1 block w-full">
+                    <option value="private">Private</option>
+                    <option value="public">Public</option>
+                    <option value="NGO">NGO</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="cashOutFlow" class="block text-gray-700">Cash Out Flow</label>
+                <input type="number" id="cashOutFlow" name="cashOutFlow" required class="form-input mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="cashInflow" class="block text-gray-700">Cash Inflow</label>
+                <input type="number" id="cashInflow" name="cashInflow" required class="form-input mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="employeeCount" class="block text-gray-700">Employee Count</label>
+                <input type="number" id="employeeCount" name="employeeCount" required class="form-input mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="countryOfOrigin" class="block text-gray-700">Country of Origin</label>
+                <input type="text" id="countryOfOrigin" name="countryOfOrigin" required class="form-input mt-1 block w-full">
+            </div>
+            <div class="mb-4">
+                <label for="companyReputation" class="block text-gray-700">Company Reputation</label>
+                <select id="companyReputation" name="companyReputation" required class="form-input mt-1 block w-full">
+                    <option value="excelent">Excellent</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                    <option value="banned">Banned</option>
+                </select>
+            
+            </div>
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create</button>
+        </form>
+    </div>
+    
+    <div class="text-center p-8">
+        <!-- Button <div> for updating a company -->
+        <button onclick="goToUpdateCompany()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            Go to Update Company(Admin)
+        </button>
+    </div>
+
+    <div class="text-center p-8">
+        <!-- Button <div> for updating a company -->
+        <button onclick="goToHome()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            Home Page
+        </button>
+    </div>
+    
+
+
+    <script>
+        const createCompanyForm = document.getElementById('createCompanyForm');
+        
+        function goToHome() {
+            window.location.href = "index.html";
+        }
+
+        function goToUpdateCompany() {
+            window.location.href = "updateCompanyAdmin.html";
+        }
+
+        createCompanyForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(createCompanyForm);
+            const companyData = {};
+            formData.forEach((value, key) => {
+                companyData[key] = value;
+            });
+            createCompany(companyData);
+        });
+
+        function createCompany(companyData) {
+            fetch('http://localhost:3000/create-company', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(companyData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                getAllCompanies();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function getAllCompanies() {
+            fetch('http://localhost:3000/get-company')
+            .then(response => response.json())
+            .then(data => {
+                displayCompanies(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function searchCompanies() {
+            const searchInput = document.getElementById('search-input').value;
+            fetch(`http://localhost:3000/get-company?key=${searchInput}`)
+            .then(response => response.json())
+            .then(data => {
+                displayCompanies(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function displayCompanies(companies) {
+            const companyContainer = document.getElementById('show-companies');
+            companyContainer.innerHTML = '';
+
+            const table = document.createElement('table');
+            table.classList.add('company-table');
+
+            const headerRow = table.insertRow();
+            const headers = ['Company ID', 'Name', 'CashInFlow', 'CashOutFlow','Type', 'Employee Count', 'Country', 'Reputation','PoorRepMonths'];
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+
+            companies.forEach(company => {
+                const row = table.insertRow();
+                const companyData = [company.Key, company.Record.name, company.Record.cashInflow, company.Record.cashOutFlow, company.Record.companyType, company.Record.employeeCount, company.Record.countryOfOrigin, company.Record.companyReputation, company.Record.poorRepMonth];
+                companyData.forEach(data => {
+                    const cell = row.insertCell();
+                    cell.textContent = data;
+                });
+            });
+
+            companyContainer.appendChild(table);
+        }
+
+        function viewAllCompanies() {
+            getAllCompanies();
+        }
+    </script>
+</body>
+</html>

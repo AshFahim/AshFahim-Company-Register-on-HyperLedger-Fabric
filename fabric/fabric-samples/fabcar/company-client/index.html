@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-200 h-screen flex justify-center items-center">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-semibold mb-6">Welcome</h1>
+        <div class="grid grid-cols-2 gap-4">
+            <a href="./userHome.html" class="btn-user">User</a>
+            <button onclick="showAdminForm()" class="btn-admin">Admin</button>
+        </div>
+        <div id="adminForm" class="hidden mt-4">
+            <input id="nid" type="text" placeholder="Admin NID" class="input-field">
+            <input id="password" type="password" placeholder="Password" class="input-field mt-2">
+            <button onclick="login()" class="btn-login mt-2">Login</button>
+        </div>
+    </div>
+
+    <script>
+        function showAdminForm() {
+            var adminForm = document.getElementById('adminForm');
+            adminForm.classList.toggle('hidden');
+        }
+
+        function login() {
+            var nid = document.getElementById('nid').value;
+            var password = document.getElementById('password').value;
+
+            // Check if nid and password match
+            if (nid === '123' && password === '456') {
+                window.location.href = './adminHome.html';
+            } else {
+                alert('Incorrect NID or password');
+            }
+        }
+    </script>
+</body>
+</html>

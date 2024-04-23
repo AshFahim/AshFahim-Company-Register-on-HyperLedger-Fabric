@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Company Management</title>
+</head>
+<body>
+    <div class="text-center">
+        <h1>Company Management</h1>
+        <button onclick="getAllCompanies()">Get All Companies</button>
+        <span>||</span>
+        <input id="search-input" type="text" placeholder="Search by ID, Country, or Reputation">
+        <button onclick="searchCompanies()">Search</button>
+        <div id="show-companies"></div>
+    </div>
+
+    <div class="text-center form-container">
+        <h3>Create Company</h3>
+        <form id="createCompanyForm">
+            <div>
+                <label for="companyID">Company ID</label>
+                <input type="text" id="companyID" name="companyID" required>
+            </div>
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="companyType">Company Type</label>
+                <select id="companyType" name="companyType" required>
+                    <option value="private">Private</option>
+                    <option value="public">Public</option>
+                    <option value="NGO">NGO</option>
+                </select>
+            </div>
+            <div>
+                <label for="employeeCount">Employee Count</label>
+                <input type="number" id="employeeCount" name="employeeCount" required>
+            </div>
+            <div>
+                <label for="countryOfOrigin">Country of Origin</label>
+                <input type="text" id="countryOfOrigin" name="countryOfOrigin" required>
+            </div>
+            <button type="submit">Create</button>
+        </form>
+    </div>
+
+    <div class="text-center">
+        <button onclick="viewAllCompanies()">View All Companies</button>
+    </div>
+
+    <script>
+        const createCompanyForm = document.getElementById('createCompanyForm');
+
+        createCompanyForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(createCompanyForm);
+            const companyData = {};
+            formData.forEach((value, key) => {
+                companyData[key] = value;
+            });
+            createCompany(companyData);
+        });
+
+        function createCompany(companyData) {
+            fetch('http://localhost:3000/create-company', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(companyData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                getAllCompanies();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function getAllCompanies() {
+            fetch('http://localhost:3000/get-company')
+            .then(response => response.json())
+            .then(data => {
+                displayCompanies(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function searchCompanies() {
+            const searchInput = document.getElementById('search-input').value;
+            fetch(`http://localhost:3000/get-company?key=${searchInput}`)
+            .then(response => response.json())
+            .then(data => {
+                displayCompanies(data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function displayCompanies(companies) {
+            const companyContainer = document.getElementById('show-companies');
+            companyContainer.innerHTML = '';
+
+            const table = document.createElement('table');
+            table.classList.add('company-table');
+
+            const headerRow = table.insertRow();
+            const headers = ['Company ID', 'Name', 'Type', 'Employee Count', 'Country', 'Reputation'];
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+
+            companies.forEach(company => {
+                const row = table.insertRow();
+                const companyData = [company.Key, company.Record.name, company.Record.companyType, company.Record.employeeCount, company.Record.countryOfOrigin, company.Record.companyReputation];
+                companyData.forEach(data => {
+                    const cell = row.insertCell();
+                    cell.textContent = data;
+                });
+            });
+
+            companyContainer.appendChild(table);
+        }
+
+        function viewAllCompanies() {
+            getAllCompanies();
+        }
+    </script>
+</body>
+</html>
